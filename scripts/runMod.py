@@ -1,6 +1,5 @@
 from modeller import *
 from modeller.automodel import *    # Load the automodel class
-
 #log.verbose()
 
 # Override the 'special_restraints' and 'user_after_single_model' methods:

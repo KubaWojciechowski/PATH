@@ -91,13 +91,14 @@ if __name__ == '__main__':
     output_path = args.output
            
     # Modeling
-    #os.mkdir(output_path)
+    os.mkdir(output_path)
 
     fasta = SeqIO.parse(input_path,'fasta')
 
     template_fasta = '../../../templates.fasta'
 
     proteins = []
+    prot_names = []
     for record in fasta:
         sequences = str(record.seq)
         if len(sequences) > 6:
@@ -108,42 +109,20 @@ if __name__ == '__main__':
         else:
             sequences = list(sequences)
         
+        prot_names.append(record.id)
         proteins.append(sequences)
-        """
+        
         #Add multiprocessing
 
         with concurrent.futures.ProcessPoolExecutor() as executor:
             for s in sequences:
                 future = executor.submit(model,s,output_path)
         
-        for sequence in sequences:
-            dir_path = output_path+'/'+sequence
-            
-            if not os.path.exists(dir_path):
-                os.mkdir(dir_path)
-
-                for template in ['class1', 'class2', 'class4', 'class5', 'class6', 'class7', 'class8']:
-
-                    models_path = output_path+'/'+sequence+'/'+template
-                    os.mkdir(models_path)
-
-                    template_path = './templates/'+template+'.pdb'
-                    os.link(template_path, models_path+'/'+template+'.pdb') 
-                    os.link('scripts/runMod.py', models_path+'/runMod.py') 
-                    
-                    os.chdir(models_path)
-
-                    infile(sequence, template, template_fasta)
-                    
-                    runScript("mod9.23 runMod.py")
-
-                    os.chdir('../../../')
-        """
     # Scoring
     os.chdir(output_path)
     
-    #os.link('../scripts/data.sh', 'data.sh') 
-    #os.link('../scripts/score2.py', 'score2.py')
+    os.link('../scripts/data.sh', 'data.sh') 
+    os.link('../scripts/score2.py', 'score2.py')
     
     runScript("bash data.sh > results.csv")
     runScript("python score2.py")
@@ -175,5 +154,11 @@ if __name__ == '__main__':
 
     results.to_csv('hexapeptides.csv', index=False)
 
-    print(seq)
-    print(prediction)
+    pred_d = {seq[i]:prediction[i] for i in range(len(seq))}
+    print("Amylodogenic fragments:")
+
+    for p in range(len(prot_names)):
+        print(prot_names[p])
+        for hexapeptide in proteins[p]:
+            if pred_d[hexapeptide] == 1:
+                print(hexapeptide)
