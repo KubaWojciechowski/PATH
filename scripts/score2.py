@@ -1,6 +1,7 @@
 import os
 import pyrosetta as pr
 from pyrosetta.toolbox import cleanATOM
+import concurrent.futures 
 pr.init()
 
 def eTerms(pose):
@@ -44,6 +45,21 @@ def writeLine(fileName,seq,aclass,model,energy):
             energy['ref'],energy['rama_prepro']), file=fileName)
 
 
+def score_structures(struct, path, seq, f):
+    if struct.endswith(".pdb") and struct.startswith("sequence"):
+                       
+        sFile = struct
+        modelNum = int(struct.split('.')[1][-3:])
+
+        os.chdir(path)
+
+        energy = getScore(struct)
+
+        writeLine(f,seq,classDir[-1],modelNum,energy)
+
+        os.chdir('../../')
+
+
 if __name__ == '__main__':
 
     scorefxn = pr.get_fa_scorefxn()
@@ -62,7 +78,10 @@ if __name__ == '__main__':
 
                 path = seq+'/'+classDir
 
-                for struct in os.listdir(path):
+                with concurrent.futures.ThreadPoolExecutor() as executor:
+                    for struct in os.listdir(path):
+                        future = executor.submit(score_structures, struct, path, seq, f)
+                    """
                     if struct.endswith(".pdb") and struct.startswith("sequence"):
                        
                         sFile = struct
@@ -75,6 +94,7 @@ if __name__ == '__main__':
                         writeLine(f,seq,classDir[-1],modelNum,energy)
 
                         os.chdir('../../')
+                    """
 
     f.close()
 
