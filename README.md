@@ -9,6 +9,7 @@ As well as some Python packages:
 * Numpy
 * Pandas
 * Biopython
+* Scikit-learn
 ## Input
 PATH takes as an input protein sequences in fasta format.
 ## Running PATH

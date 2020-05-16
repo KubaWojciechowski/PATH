@@ -78,7 +78,7 @@ def model(sequence, output_path):
 
             infile(sequence, template, template_fasta)
                     
-            runScript("mod9.23 runMod.py")
+            runScript("mod9.19 runMod.py")
 
             os.chdir('../../../')
 
@@ -107,7 +107,8 @@ if __name__ == '__main__':
             sequences = [tmp.append(subseqs[i]) for i in range(len(subseqs))]
             sequences = tmp
         else:
-            sequences = list(sequences)
+            sequences = [sequences]
+            print(sequences)
         
         prot_names.append(record.id)
         proteins.append(sequences)
